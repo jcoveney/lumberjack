@@ -41,8 +41,47 @@ object Lumberjack {
       def name:String = t.get(0).asInstanceOf
     }
 
+    val mapTemplate =
+"""object %1$s {
+  def apply(m:Map[String,Object]) = new %1$s(m)
+}
+class %1$s private (m:Map[String,Object) {
+  def get(key:String):%2$s = %2$s(m.get(key).asInstanceOf)
+}"""
+
+    val bagTemplate =
+"""object %1$s {
+  apply(wrappedBag:DataBag) = new %1$s(wrappedBag)
+}
+class %1$s private (wrappedBag:DataBag) extends Iterable[%2$s] {
+  override def iterator:Iterator[%2$s] = new Iterator[%2$s] {
+    private val wrappedIterator:jIterator[Tuple] = wrappedBag.iterator
+    override def next():%2$s = %2$s(wrappedIterator.next())
+    override def hasNext:Boolean = wrappedIterator.hasNext
+  }
+}"""
+
+    val tupleTemplate =
+"""object NAME {
+  def apply(t:Tuple) = new NAME(t)
+}
+class NAME {
+CLASSDEFINITONS
+FIELDS
+}"""
+
+    val basseTemplate =
+"""object NAME {
+  def apply(t:Tuple) = new NAME(t)
+  lazy val getDummyWrapper = apply(null)
+}
+class NAME {
+CLASSDEFINITONS
+FIELDS
+}"""
+
     object Ljm4 {
-      def apply(m:Map[String,Ljm4t]) = new Ljm4(m)
+      def apply(m:Map[String,Object]) = new Ljm4(m)
     }
     //TODO if we have the type info then it should be typed
     //TODO it can be a tuple, or a single bag or primitive
